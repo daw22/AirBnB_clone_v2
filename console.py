@@ -118,11 +118,15 @@ class HBNBCommand(cmd.Cmd):
         if not args:
             print("** class name missing **")
             return
-        elif args not in HBNBCommand.classes:
+        args = args.split()
+        if args[0] not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        new_instance = HBNBCommand.classes[args]()
-        storage.save()
+        class_args = self.parse_args(args[1:])
+        new_instance = eval(args[0])()
+        for key, value in class_args.items():
+            if key != "__class__":
+                setattr(new_instance, key, value)
         print(new_instance.id)
         storage.save()
 
@@ -314,6 +318,30 @@ class HBNBCommand(cmd.Cmd):
                 new_dict.__dict__.update({att_name: att_val})
 
         new_dict.save()  # save updates to file
+
+    # helper methods
+    def parse_args(self, args):
+        """
+        parses class args into a dict of
+        key value pairs
+        """
+        kv_dict = {}
+        for arg in args:
+            arg = arg.split('=')
+            key = arg[0]
+            value = arg[1]
+            if value[0] == '"' and value[-1] == '"':
+                value = value.strip('"').replace("_", " ")
+            else:
+                try:
+                    value = int(value)
+                except Exception:
+                    try:
+                        value = float(value)
+                    except Exception:
+                        pass
+            kv_dict[key] = value
+        return kv_dict
 
     def help_update(self):
         """ Help information for the update class """
