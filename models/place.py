@@ -4,8 +4,16 @@ import os
 from models import storage
 from models.base_model import BaseModel, Base
 from models.review import Review
-from sqlalchemy import Column, String, Integer, Float, ForeignKey
+from models.amenity import Amenity
+from sqlalchemy import Table, Column, String, Integer, Float, ForeignKey
 from sqlalchemy.orm import relationship
+
+
+place_amenity = Table("place_amenity", Base.metadata,
+                      Column("place_id", String(60), ForeignKey("places.id"),
+                             primary_key=True),
+                      Column("amenity_id", String(60),
+                             ForeignKey("amenities.id"), primary_key=True))
 
 
 class Place(BaseModel, Base):
@@ -23,11 +31,22 @@ class Place(BaseModel, Base):
     longitude = Column(Float, nullable=True)
     amenity_ids = []
     reviews = None
+    amenities = None
     if os.getenv("HBNB_TYPE_STORAGE", "db") == "db":
         reviews = relationship("Review", back_populates="place",
                                cascade="all, delete, delete-orphan")
+        amenities = relationship("Amenity", secondary=place_amenity,
+                                 viewonly=False)
     elif os.getenv("HBNB_TYPE_STORAGE", "db") == "file":
         reviews = [review for review in storage.all(Review)
                    if review.place_id == self.id]
+        @amenities.getter
+        def amenities(self):
+            return [amenity for amenity in storage.all(Amenity)
+                    if amenity.id in self.amenity_ids]
+        @amenities.setter
+        def amenities(self, amenity):
+            if type(amenity) is Amenity:
+                self.amenity_ids.append(amenity.id)
 
 Review.place = relationship("Place", back_populates="reviews")
