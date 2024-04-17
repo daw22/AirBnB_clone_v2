@@ -25,6 +25,13 @@ class DBStorage():
 
     def all(self, cls=None):
         """Queries database."""
+        from models.state import State
+        from models.city import City
+        from models.review import Review
+        from models.amenities import Amenity
+        from models.place import Place
+        from models.user import User
+
         objs = []
         if cls is not None:
             objs = self.__session.query(cls).all()

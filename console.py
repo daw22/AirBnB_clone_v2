@@ -330,17 +330,21 @@ class HBNBCommand(cmd.Cmd):
             arg = arg.split('=')
             key = arg[0]
             value = arg[1]
+            is_str = False
             if value[0] == '"' and value[-1] == '"':
                 value = value.strip('"').replace("_", " ")
+                is_str = True
             else:
                 try:
-                    value = int(value)
-                except Exception:
-                    try:
+                    if "." in value:
                         value = float(value)
-                    except Exception:
-                        pass
-            kv_dict[key] = value
+                    else:
+                        value = int(value)
+                except Exception:
+                    pass
+
+            if is_str or type(value) in [int, float]:
+                kv_dict[key] = value
         return kv_dict
 
     def help_update(self):
