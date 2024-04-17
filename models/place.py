@@ -43,6 +43,7 @@ class Place(BaseModel, Base):
 
         @amenities.getter
         def amenities(self):
+            """Getter and setter pair for amenities"""
             return [amenity for amenity in storage.all(Amenity)
                     if amenity.id in self.amenity_ids]
 
