@@ -2,6 +2,12 @@
 """ Module for testing file storage"""
 import unittest
 from models.base_model import BaseModel
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.user import User
+from models.review import Review
+from models.place import Place
 from models import storage
 import os
 
@@ -40,6 +46,18 @@ class test_fileStorage(unittest.TestCase):
         new = BaseModel()
         temp = storage.all()
         self.assertIsInstance(temp, dict)
+
+    def test_all_filtering(self):
+        """ tests the all method with class filtering"""
+        State().save()
+        User().save()
+        City().save()
+        Amenity().save()
+        Place().save()
+        Review().save()
+        for cls in [State, City, Amenity, Place, Review, User]:
+            for obj in storage.all(cls).values():
+                self.assertIsInstance(obj, cls)
 
     def test_base_model_instantiation(self):
         """ File is not created on BaseModel save """
