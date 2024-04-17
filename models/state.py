@@ -17,7 +17,8 @@ class State(BaseModel, Base):
         cities = relationship('City', back_populates='state',
                               cascade='all, delete, delete-orphan')
     elif os.getenv('HBNB_TYPE_STORAGE', 'db') == 'file':
-        cities = [city for city in storage.all(City) if city.state_id == self.id]
+        cities = [city for city in storage.all(City)
+                  if city.state_id == self.id]
 
 
 City.state = relationship('State', back_populates='cities')
