@@ -1,11 +1,15 @@
 #!/usr/bin/python3
 """ """
+from models import storage
 from models.base_model import BaseModel
 import unittest
 import datetime
 from uuid import UUID
 import json
 import os
+
+
+strg = os.getenv("HBNB_TYPE_STORAGE")
 
 
 class test_basemodel(unittest.TestCase):
@@ -47,6 +51,7 @@ class test_basemodel(unittest.TestCase):
         with self.assertRaises(TypeError):
             new = BaseModel(**copy)
 
+    @unittest.skipIf(strg == 'db', "The database expects non-null args")
     def test_save(self):
         """ Testing save """
         i = self.value()

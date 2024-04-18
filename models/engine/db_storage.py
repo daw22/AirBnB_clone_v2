@@ -4,7 +4,7 @@ Implements database storage
 """
 from os import environ
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.orm import sessionmaker, scoped_session, declarative_base
 
 
 class DBStorage():
@@ -21,6 +21,7 @@ class DBStorage():
                            environ.get('HBNB_MYSQL_DB'))
         self.__engine = create_engine(conn, pool_pre_ping=True)
         if environ.get('HBNB_ENV') == 'test':
+            Base = declarative_base()
             Base.metadata.drop_all(bind=self.__engine)
 
     def all(self, cls=None):

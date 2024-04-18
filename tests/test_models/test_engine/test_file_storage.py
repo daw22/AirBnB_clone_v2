@@ -6,9 +6,13 @@ from models import storage
 import os
 
 
+strg = os.getenv("HBNB_TYPE_STORAGE")
+
+
 class test_fileStorage(unittest.TestCase):
     """ Class to test the file storage method """
 
+    @unittest.skipIf(strg == "db", "Database")
     def setUp(self):
         """ Set up test environment """
         del_list = []
