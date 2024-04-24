@@ -103,6 +103,7 @@ class test_fileStorage(unittest.TestCase):
         """ Confirm __objects is a dict """
         self.assertEqual(type(storage.all()), dict)
 
+    @unittest.skipIf(strg == 'db', "BaseModel not mapped to a table")
     def test_key_format(self):
         """ Key is properly formatted """
         new = State(name='California')
