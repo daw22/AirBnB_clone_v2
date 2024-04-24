@@ -26,12 +26,24 @@ class DBStorage():
 
     def all(self, cls=None):
         """Queries database."""
+        from models.base_model import Base
+        from models import base_model, user, state
+        from models import city, amenity, place, review
+
+        User = user.User
+        State = state.State
+        City = city.City
+        Amenity = amenity.Amenity
+        Place = place.Place
+        Review = review.Review
+
+        classes = [User, State, City, Amenity, Place, Review]
         objs = []
         if cls is not None:
             objs = self.__session.query(cls).all()
         else:
-            objs = self.__session.query(User, State, City, Review,
-                                        Amenity, Place, Review)
+            for cl in classes:
+                objs.extend(self.__session.query(cl).all())
         dct = {}
         for obj in objs:
             key = "{}.{}".format(obj.__class__.__name__, obj.id)

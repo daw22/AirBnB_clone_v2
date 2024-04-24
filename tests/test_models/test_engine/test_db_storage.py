@@ -1,17 +1,21 @@
 #!/usr/bin/python3
-""" Module for testing file storage"""
+"""
+
+Test file for db storage
+
+"""
+import os
 import unittest
+from models import storage
 from models.base_model import BaseModel
 from models.state import State
-from models import storage
-import os
 
 
 strg = os.getenv("HBNB_TYPE_STORAGE")
 
 
-class test_fileStorage(unittest.TestCase):
-    """ Class to test the file storage method """
+class test_dbStorage(unittest.TestCase):
+    """Tests db storage of the application"""
 
     def setUp(self):
         """ Set up test environment """
@@ -52,22 +56,6 @@ class test_fileStorage(unittest.TestCase):
         new = BaseModel()
         self.assertFalse(os.path.exists('file.json'))
 
-    @unittest.skipIf(strg == 'db', "BaseModel not mapped to a table")
-    def test_empty(self):
-        """ Data is saved to file """
-        new = BaseModel()
-        thing = new.to_dict()
-        new.save()
-        new2 = BaseModel(**thing)
-        self.assertNotEqual(os.path.getsize('file.json'), 0)
-
-    @unittest.skipIf(strg == 'db', "BaseModel not mapped to a table")
-    def test_save(self):
-        """ FileStorage save method """
-        new = BaseModel()
-        storage.save()
-        self.assertTrue(os.path.exists('file.json'))
-
     def test_reload(self):
         """ Storage file is successfully loaded to __objects """
         new = State(name='California')
@@ -75,24 +63,9 @@ class test_fileStorage(unittest.TestCase):
         storage.reload()
         self.assertIsNotNone(storage.all().get("State.{}".format(new.id)))
 
-    @unittest.skipIf(strg == 'db', "BaseModel not mapped to a table")
-    def test_reload_empty(self):
-        """ Load from an empty file """
-        with open('file.json', 'w') as f:
-            pass
-        with self.assertRaises(ValueError):
-            storage.reload()
-
     def test_reload_from_nonexistent(self):
         """ Nothing happens if file does not exist """
         self.assertEqual(storage.reload(), None)
-
-    @unittest.skipIf(strg == 'db', "BaseModel not mapped to a table")
-    def test_object_save(self):
-        """ BaseModel save method calls storage save """
-        new = State()
-        new.save()
-        self.assertTrue(os.path.exists('file.json'))
 
     @unittest.skipIf(strg == 'db', "BaseModel not mapped to a table")
     def test_type_path(self):
@@ -111,8 +84,8 @@ class test_fileStorage(unittest.TestCase):
         _id = new.to_dict()['id']
         self.assertIsNotNone(storage.all().get('State.{}'.format(_id)))
 
-    @unittest.skipIf(strg == 'db', "BaseModel not mapped to a table")
+    @unittest.skipIf(strg != 'db', "FileStorage created in that case")
     def test_storage_var_created(self):
-        """ FileStorage object storage created """
-        from models.engine.file_storage import FileStorage
-        self.assertEqual(type(storage), FileStorage)
+        """ DBStorage object storage created """
+        from models.engine.db_storage import DBStorage
+        self.assertEqual(type(storage), DBStorage)
