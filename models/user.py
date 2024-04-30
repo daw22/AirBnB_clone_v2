@@ -1,25 +1,18 @@
 #!/usr/bin/python3
-"""This module defines a class User"""
-from models.base_model import BaseModel, Base
-from models.place import Place
-from models.review import Review
-from sqlalchemy import Column, String
-from sqlalchemy.orm import relationship
+"""
+contains
+
+classes:
+    User - Inherits from BaseModel, represents a user
+"""
+from models.base_model import BaseModel
 
 
-class User(BaseModel, Base):
-    """This class defines a user by various attributes"""
-    __tablename__ = 'users'
-    email = Column(String(128), nullable=False)
-    password = Column(String(128), nullable=False)
-    first_name = Column(String(128), nullable=True)
-    last_name = Column(String(128), nullable=True)
-    places = relationship("Place", back_populates="user",
-                          cascade="all, delete, delete-orphan")
-    reviews = []
-    reviews = relationship("Review", back_populates="user",
-                           cascade="all, delete, delete-orphan")
-
-
-Place.user = relationship("User", back_populates="places")
-Review.user = relationship("User", back_populates="reviews")
+class User(BaseModel):
+    """
+    Represents a user of the service, inherits from BaseModel.
+    """
+    email = ""
+    password = ""
+    first_name = ""
+    last_name = ""

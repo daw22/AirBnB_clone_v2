@@ -1,18 +1,16 @@
 #!/usr/bin/python3
-""" City Module for HBNB project """
-from models.base_model import BaseModel, Base
-from models.place import Place
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship
+"""
+contains
+
+classes:
+    City - represents a real-life city
+"""
+from models.base_model import BaseModel
 
 
-class City(BaseModel, Base):
-    """ The city class, contains state ID and name """
-    __tablename__ = "cities"
-    name = Column(String(128), nullable=False)
-    state_id = Column(String(60), ForeignKey('states.id'), nullable=False)
-    places = relationship("Place", back_populates="cities",
-                          cascade="all, delete, delete-orphan")
-
-
-Place.cities = relationship("City", back_populates="places")
+class City(BaseModel):
+    """
+    Represents a real-life city, inherits from BaseModel.
+    """
+    state_id = ""
+    name = ""

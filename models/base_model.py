@@ -1,29 +1,32 @@
 #!/usr/bin/python3
-"""This module defines a base class for all models in our hbnb clone"""
-import uuid
+"""
+contains
+
+classes:
+    BaseModel - A base class to be inherited by the other models/classes of the
+                project
+"""
 from datetime import datetime
 from models import storage
-from sqlalchemy import create_engine, Column, Integer, String, DateTime
-from sqlalchemy.orm import declarative_base, sessionmaker
-
-
-Base = declarative_base()
+import uuid
 
 
 class BaseModel:
-    """A base class for all hbnb models"""
-    id = Column(String(60), primary_key=True)
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow())
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow())
-
+    """
+    Base class for other class to inherit from.
+    """
     def __init__(self, *args, **kwargs):
-        """Instatntiates a new model"""
-        if not kwargs:
-            from models import storage
-            self.id = str(uuid.uuid4())
-            self.created_at = datetime.now()
-            self.updated_at = datetime.now()
-        else:
+        """
+        Initializes a newly created instance of the class.
+
+        Args:
+            args: tuple of positional arguments.
+            kwargs: dictionary of keyword/named arguments.
+        """
+        self.id = str(uuid.uuid4())
+        self.created_at = datetime.now()
+        self.updated_at = datetime.now()
+        if kwargs:
             for key in kwargs.keys():
                 if key != "__class__":
                     if key in ("created_at", "updated_at"):
@@ -31,38 +34,28 @@ class BaseModel:
                         self.__dict__[key] = new_datetime
                     else:
                         self.__dict__[key] = kwargs[key]
-            if self.id is None:
-                self.id = str(uuid.uuid4())
-            if self.created_at is None:
-                self.created_at = datetime.now()
-            if self.updated_at is None:
-                self.updated_at = datetime.now()
+        storage.new(self)
 
     def __str__(self):
-        """Returns a string representation of the instance"""
-        cls_name = self.__class__.__name__
-        dct = self.to_dict()
-        dct.pop('__class__')
-        return "[{}] ({}) {}".format(cls_name, self.id, dct)
+        """
+        Returns an informal representation of an instance.
+        """
+        class_name = self.__class__.__name__
+        return "[{}] ({}) {}".format(class_name, self.id, self.__dict__)
 
     def save(self):
-        """Updates updated_at with current time when instance is changed"""
+        """
+        Updates the updated_at attribute of an instance to the current time.
+        """
         self.updated_at = datetime.now()
-        storage.new(self)
         storage.save()
 
     def to_dict(self):
-        """Convert instance into dict format"""
-        dictionary = {}
-        dictionary.update(self.__dict__)
-        dictionary.update({'__class__':
-                           self.__class__.__name__})
-        dictionary['created_at'] = self.created_at.isoformat()
-        dictionary['updated_at'] = self.updated_at.isoformat()
-        if dictionary.get('_sa_instance_state') is not None:
-            del dictionary['_sa_instance_state']
-        return dictionary
-
-    def delete(self):
-        """Deletes instance from storage"""
-        storage.delete(self)
+        """
+        Returns a dictionary of all necessary attributes of an instance.
+        """
+        obj_dict = self.__dict__.copy()
+        obj_dict["__class__"] = self.__class__.__name__
+        obj_dict["created_at"] = obj_dict["created_at"].isoformat()
+        obj_dict["updated_at"] = obj_dict["updated_at"].isoformat()
+        return (obj_dict)

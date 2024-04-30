@@ -1,119 +1,111 @@
 #!/usr/bin/python3
-""" Module for testing file storage"""
-import unittest
+"""
+contains
+
+classes:
+    TestFileStorage - unittest test cases for the FileStorage class
+"""
+import json
+from models.engine.file_storage import FileStorage
 from models.base_model import BaseModel
-from models.state import State
-from models import storage
-import os
+import unittest
 
 
-strg = os.getenv("HBNB_TYPE_STORAGE")
-
-
-class test_fileStorage(unittest.TestCase):
-    """ Class to test the file storage method """
-
+class TestFileStorage(unittest.TestCase):
+    """
+    Contains test cases for the FileStorage class.
+    """
     def setUp(self):
-        """ Set up test environment """
-        del_list = []
-        if strg != 'db':
-            for key in storage._FileStorage__objects.keys():
-                del_list.append(key)
-            for key in del_list:
-                del storage._FileStorage__objects[key]
+        """
+        Set up code executed before each test/method.
+        """
+        self.storage = FileStorage()
 
-    def tearDown(self):
-        """ Remove storage file at end of tests """
-        try:
-            os.remove('file.json')
-        except Exception:
-            pass
+    def test_private_attrs(self):
+        """
+        Tests that the private attributes can't be accessed with their names.
+        """
+        with self.assertRaises(AttributeError):
+            objects = self.storage.__objects
 
-    @unittest.skipIf(strg == 'db', "No __objects")
-    def test_obj_list_empty(self):
-        """ __objects is initially empty """
-        self.assertEqual(len(storage.all()), 0)
+        with self.assertRaises(AttributeError):
+            file_path = self.storage.__file_path
 
-    def test_new(self):
-        """ New object is correctly added to __objects """
-        new = State(name='California')
-        storage.new(new)
-        obj = storage.all().get('State.{}'.format(new.id))
-        self.assertTrue(new is obj)
+        with self.assertRaises(AttributeError):
+            objects = FileStorage.__objects
+
+        with self.assertRaises(AttributeError):
+            file_path = FileStorage.__file_path
+
+        objects = FileStorage._FileStorage__objects
+        file_path = FileStorage._FileStorage__file_path
+        self.assertIsInstance(objects, dict)
+        self.assertIsInstance(file_path, str)
 
     def test_all(self):
-        """ __objects is properly returned """
-        new = BaseModel()
-        temp = storage.all()
-        self.assertIsInstance(temp, dict)
+        """
+        Tests the all method of FileStorage instances.
+        """
+        all_objs = self.storage.all()
+        self.assertIsInstance(all_objs, dict)
+        base = BaseModel()
+        base.name = "Base model"
+        base.number = 98
+        all_objs = self.storage.all()
+        self.assertNotEqual(all_objs, {})
+        key = "{}.{}".format(base.__class__.__name__, base.id)
+        self.assertTrue(key in all_objs)
+        self.assertEqual(base.to_dict(), all_objs[key].to_dict())
 
-    def test_base_model_instantiation(self):
-        """ File is not created on BaseModel save """
-        new = BaseModel()
-        self.assertFalse(os.path.exists('file.json'))
+    def test_new(self):
+        """
+        Tests the new method of FileStorage instances.
+        """
+        base = BaseModel()
+        base.name = "Base model"
+        base.number = 98
+        all_objs = self.storage.all()
+        self.assertNotEqual(all_objs, {})
+        key = "{}.{}".format(base.__class__.__name__, base.id)
+        self.assertTrue(key in all_objs)
+        self.assertEqual(base.to_dict(), all_objs[key].to_dict())
+        self.storage.new(base)
+        new_objs = self.storage.all()
+        # Doesn't insert the same object twice (no duplicate keys in a dict)
+        self.assertEqual(new_objs, all_objs)
+        base2 = BaseModel(**base.to_dict())
+        new_objs = self.storage.all()
+        self.assertEqual(new_objs, all_objs)
 
-    @unittest.skipIf(strg == 'db', "BaseModel not mapped to a table")
-    def test_empty(self):
-        """ Data is saved to file """
-        new = BaseModel()
-        thing = new.to_dict()
-        new.save()
-        new2 = BaseModel(**thing)
-        self.assertNotEqual(os.path.getsize('file.json'), 0)
-
-    @unittest.skipIf(strg == 'db', "BaseModel not mapped to a table")
     def test_save(self):
-        """ FileStorage save method """
-        new = BaseModel()
-        storage.save()
-        self.assertTrue(os.path.exists('file.json'))
+        """
+        Tests the save method of FileStorage instances.
+        """
+        base = BaseModel()
+        self.storage.save()
+        # Hardcoded filename used here
+        with open("file.json", "rt", encoding="utf-8") as f:
+            file_objs = json.load(f)
+
+        all_objs = self.storage.all()
+        self.assertIsInstance(file_objs, dict)
+        for key in all_objs.keys():
+            self.assertTrue(key in file_objs)
+            self.assertIsInstance(file_objs[key], dict)
 
     def test_reload(self):
-        """ Storage file is successfully loaded to __objects """
-        new = State(name='California')
-        new.save()
-        storage.reload()
-        self.assertIsNotNone(storage.all().get("State.{}".format(new.id)))
-
-    @unittest.skipIf(strg == 'db', "BaseModel not mapped to a table")
-    def test_reload_empty(self):
-        """ Load from an empty file """
-        with open('file.json', 'w') as f:
-            pass
-        with self.assertRaises(ValueError):
-            storage.reload()
-
-    def test_reload_from_nonexistent(self):
-        """ Nothing happens if file does not exist """
-        self.assertEqual(storage.reload(), None)
-
-    @unittest.skipIf(strg == 'db', "BaseModel not mapped to a table")
-    def test_object_save(self):
-        """ BaseModel save method calls storage save """
-        new = State()
-        new.save()
-        self.assertTrue(os.path.exists('file.json'))
-
-    @unittest.skipIf(strg == 'db', "BaseModel not mapped to a table")
-    def test_type_path(self):
-        """ Confirm __file_path is string """
-        self.assertEqual(type(storage._FileStorage__file_path), str)
-
-    def test_type_objects(self):
-        """ Confirm __objects is a dict """
-        self.assertEqual(type(storage.all()), dict)
-
-    @unittest.skipIf(strg == 'db', "BaseModel not mapped to a table")
-    def test_key_format(self):
-        """ Key is properly formatted """
-        new = State(name='California')
-        storage.new(new)
-        storage.save()
-        _id = new.to_dict()['id']
-        self.assertIsNotNone(storage.all().get('State.{}'.format(_id)))
-
-    @unittest.skipIf(strg == 'db', "BaseModel not mapped to a table")
-    def test_storage_var_created(self):
-        """ FileStorage object storage created """
-        from models.engine.file_storage import FileStorage
-        self.assertEqual(type(storage), FileStorage)
+        """
+        Tests the reload method of FileStorage instances.
+        """
+        self.storage.reload()
+        all_objs = self.storage.all()
+        self.storage.reload()
+        new_objs = self.storage.all()
+        self.assertEqual(all_objs.keys(), new_objs.keys())
+        base = BaseModel()
+        base.save()
+        self.storage.reload()
+        new_objs = self.storage.all()
+        self.assertNotEqual(new_objs, all_objs)
+        key = "{}.{}".format(base.__class__.__name__, base.id)
+        self.assertTrue(key in new_objs)
