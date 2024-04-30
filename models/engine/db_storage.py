@@ -5,10 +5,10 @@
 Implementationof the database storage engine
 
 """
-import unittest
+import sqlalchemy
 
 
-class DBStorage(unittest.TestCase):
+class DBStorage():
     """
     Implementation of the database storage engine
     """
