@@ -100,7 +100,7 @@ class HBNBCommand(cmd.Cmd):
                         param[1] = int(param[1])
                     except ValueError:
                         param[1] = None
-                if param[1]:
+                if param[1] is not None:
                     params[param[0]] = param[1]
         obj = HBNBCommand.class_names[args[0]](**params)
         obj.save()
@@ -147,7 +147,7 @@ class HBNBCommand(cmd.Cmd):
         if obj is None:
             print("** no instance found **")
             return
-        del objs_dct[key]
+        storage.delete(obj)
         storage.save()
 
     def do_all(self, args):
