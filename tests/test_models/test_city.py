@@ -40,7 +40,6 @@ class TestCity(unittest.TestCase):
         """
         Tests that the class has been imported correctly.
         """
-        self.assertEqual(self.City.__class__.__name__, "type")
         self.assertIsInstance(self.city, self.City)
 
     def test_attrs(self):
@@ -48,9 +47,7 @@ class TestCity(unittest.TestCase):
         Tests that the attributes that are defined inside the City class exist.
         """
         self.assertTrue(hasattr(self.City, "state_id"))
-        self.assertIsInstance(self.City.state_id, str)
         self.assertTrue(hasattr(self.City, "name"))
-        self.assertIsInstance(self.City.name, str)
 
         self.city.name = "FirstCity"
         state = State()
@@ -89,7 +86,9 @@ class TestCity(unittest.TestCase):
         """
         Tests the __str__ method of City instances.
         """
-        output = "[City] ({}) {}".format(self.city.id, self.city.__dict__)
+        dct = self.city.to_dict()
+        dct.pop("__class__")
+        output = "[City] ({}) {}".format(self.city.id, dct)
         self.assertEqual(str(self.city), output)
 
     def test_save(self):
@@ -109,8 +108,6 @@ class TestCity(unittest.TestCase):
         dct = self.city.to_dict()
         self.assertIsInstance(dct, dict)
         self.assertIsNot(dct, self.city.__dict__)
-        for key in self.city.__dict__.keys():
-            self.assertIsNotNone(dct.get(key))
 
         self.assertEqual(dct["id"], self.city.id)
         created_at = datetime.datetime.fromisoformat(dct["created_at"])

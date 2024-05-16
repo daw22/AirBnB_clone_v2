@@ -30,6 +30,7 @@ class TestReview(unittest.TestCase):
         Set up code executed before each test/method.
         """
         self.review = TestReview.Review()
+        self.review.save()
 
     def test_module(self):
         """
@@ -56,7 +57,9 @@ class TestReview(unittest.TestCase):
         self.assertIsInstance(self.Review.text, str)
 
         place = Place()
+        place.save()
         user = User()
+        user.save()
         self.review.user_id = user.id
         self.review.place_id = place.id
         dct = storage.all()
@@ -98,7 +101,9 @@ class TestReview(unittest.TestCase):
         """
         Tests the __str__ method of Review instances.
         """
-        corr = "[Review] ({}) {}".format(self.review.id, self.review.__dict__)
+        dct = self.review.to_dict()
+        dct.pop("__class__")
+        corr = "[Review] ({}) {}".format(self.review.id, dct)
         self.assertEqual(str(self.review), corr)
 
     def test_save(self):

@@ -3,13 +3,16 @@
 contains
 
 classes:
-    Amenity - represents an amenity of a place
+    Amenity - represents an amenity of a place, mapped to the amenities table 
+    in the database
 """
-from models.base_model import BaseModel
+from models.base_model import BaseModel, Base
+from sqlalchemy import Column, String
 
 
-class Amenity(BaseModel):
+class Amenity(BaseModel, Base):
     """
     Represents some amenity (quality) of a place, inherits from BaseModel.
     """
-    name = ""
+    __tablename__ = "amenities"
+    name = Column(String(128), nullable=False)

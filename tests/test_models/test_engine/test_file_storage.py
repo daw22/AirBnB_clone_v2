@@ -51,6 +51,7 @@ class TestFileStorage(unittest.TestCase):
         base = BaseModel()
         base.name = "Base model"
         base.number = 98
+        base.save()
         all_objs = self.storage.all()
         self.assertNotEqual(all_objs, {})
         key = "{}.{}".format(base.__class__.__name__, base.id)
@@ -64,6 +65,7 @@ class TestFileStorage(unittest.TestCase):
         base = BaseModel()
         base.name = "Base model"
         base.number = 98
+        base.save()
         all_objs = self.storage.all()
         self.assertNotEqual(all_objs, {})
         key = "{}.{}".format(base.__class__.__name__, base.id)

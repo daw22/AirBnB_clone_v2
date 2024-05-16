@@ -95,7 +95,9 @@ class TestUser(unittest.TestCase):
         """
         Tests the __str__ method of User instances.
         """
-        output = "[User] ({}) {}".format(self.user.id, self.user.__dict__)
+        dct = self.user.to_dict()
+        dct.pop("__class__")
+        output = "[User] ({}) {}".format(self.user.id, dct)
         self.assertEqual(str(self.user), output)
 
     def test_save(self):

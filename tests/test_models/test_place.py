@@ -31,6 +31,7 @@ class TestPlace(unittest.TestCase):
         Set up code executed before each test/method.
         """
         self.place = TestPlace.Place()
+        self.place.save()
 
     def test_module(self):
         """
@@ -50,32 +51,25 @@ class TestPlace(unittest.TestCase):
         Tests that attributes that are defined inside the Place class exist.
         """
         self.assertTrue(hasattr(self.Place, "city_id"))
-        self.assertIsInstance(self.Place.city_id, str)
         self.assertTrue(hasattr(self.Place, "user_id"))
-        self.assertIsInstance(self.Place.user_id, str)
         self.assertTrue(hasattr(self.Place, "name"))
-        self.assertIsInstance(self.Place.name, str)
         self.assertTrue(hasattr(self.Place, "description"))
-        self.assertIsInstance(self.Place.description, str)
         self.assertTrue(hasattr(self.Place, "number_rooms"))
-        self.assertIsInstance(self.Place.number_rooms, int)
         self.assertTrue(hasattr(self.Place, "number_bathrooms"))
-        self.assertIsInstance(self.Place.number_bathrooms, int)
         self.assertTrue(hasattr(self.Place, "price_by_night"))
-        self.assertIsInstance(self.Place.price_by_night, int)
         self.assertTrue(hasattr(self.Place, "max_guest"))
-        self.assertIsInstance(self.Place.max_guest, int)
         self.assertTrue(hasattr(self.Place, "latitude"))
-        self.assertIsInstance(self.Place.latitude, float)
         self.assertTrue(hasattr(self.Place, "longitude"))
-        self.assertIsInstance(self.Place.longitude, float)
         self.assertTrue(hasattr(self.Place, "amenity_ids"))
-        self.assertIsInstance(self.Place.amenity_ids, list)
 
         city = City()
+        city.save()
         user = User()
+        user.save()
         amenity1 = Amenity()
+        amenity1.save()
         amenity2 = Amenity()
+        amenity2.save()
         dct = storage.all()
         self.place.city_id = city.id
         self.place.user_id = user.id
@@ -137,7 +131,9 @@ class TestPlace(unittest.TestCase):
         """
         Tests the __str__ method of Place instances.
         """
-        output = "[Place] ({}) {}".format(self.place.id, self.place.__dict__)
+        dct = self.place.to_dict()
+        dct.pop("__class__")
+        output = "[Place] ({}) {}".format(self.place.id, dct)
         self.assertEqual(str(self.place), output)
 
     def test_save(self):

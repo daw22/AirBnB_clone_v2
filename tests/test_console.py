@@ -36,6 +36,14 @@ class TestHBNBCommand(unittest.TestCase):
         self.place = Place()
         self.review = Review()
 
+        self.base.save()
+        self.user.save()
+        self.state.save()
+        self.city.save()
+        self.amenity.save()
+        self.place.save()
+        self.review.save()
+
     def test_help(self):
         """
         Tests the help command.

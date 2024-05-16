@@ -39,7 +39,6 @@ class TestState(unittest.TestCase):
         """
         Tests that the class has been imported correctly.
         """
-        self.assertEqual(self.State.__class__.__name__, "type")
         self.assertIsInstance(self.state, self.State)
 
     def test_attrs(self):
@@ -47,7 +46,6 @@ class TestState(unittest.TestCase):
         Tests that attributes that are defined inside the State class exist.
         """
         self.assertTrue(hasattr(self.State, "name"))
-        self.assertIsInstance(self.State.name, str)
 
         self.state.name = "SomeState"
 
@@ -83,7 +81,9 @@ class TestState(unittest.TestCase):
         """
         Tests the __str__ method of State instances.
         """
-        output = "[State] ({}) {}".format(self.state.id, self.state.__dict__)
+        dct = self.state.to_dict()
+        dct.pop("__class__")
+        output = "[State] ({}) {}".format(self.state.id, dct)
         self.assertEqual(str(self.state), output)
 
     def test_save(self):
@@ -103,8 +103,6 @@ class TestState(unittest.TestCase):
         dct = self.state.to_dict()
         self.assertIsInstance(dct, dict)
         self.assertIsNot(dct, self.state.__dict__)
-        for key in self.state.__dict__.keys():
-            self.assertIsNotNone(dct.get(key))
 
         self.assertEqual(dct["id"], self.state.id)
         created_at = datetime.datetime.fromisoformat(dct["created_at"])

@@ -67,7 +67,9 @@ class TestBaseModel(unittest.TestCase):
         """
         Tests the __str__ method of BaseModel instances.
         """
-        output = "[BaseModel] ({}) {}".format(self.base.id, self.base.__dict__)
+        dct = self.base.to_dict()
+        dct.pop("__class__")
+        output = "[BaseModel] ({}) {}".format(self.base.id, dct)
         self.assertEqual(str(self.base), output)
 
     def test_save(self):

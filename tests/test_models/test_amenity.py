@@ -85,7 +85,9 @@ class TestAmenity(unittest.TestCase):
         Tests the __str__ method of Amenity instances.
         """
         am = self.Amenity()
-        output = "[Amenity] ({}) {}".format(am.id, am.__dict__)
+        dct = am.to_dict()
+        dct.pop("__class__")
+        output = "[Amenity] ({}) {}".format(am.id, dct)
         self.assertEqual(str(am), output)
 
     def test_save(self):
