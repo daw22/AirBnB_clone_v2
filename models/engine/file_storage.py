@@ -30,7 +30,7 @@ class FileStorage:
         if cls is None:
             return (FileStorage.__objects)
         objs = FileStorage.__objects
-        return {key:val for key, val in objs.items() if type(val) is cls}
+        return {key: val for key, val in objs.items() if type(val) is cls}
 
     def new(self, obj):
         """
