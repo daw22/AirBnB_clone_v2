@@ -45,7 +45,6 @@ class DBStorage():
         from models.state import State
         from models.user import User
 
-
         classes = [Amenity, City, Place, Review, State, User]
 
         objs = []
@@ -88,10 +87,8 @@ class DBStorage():
         from models.state import State
         from models.user import User
 
-
         if os.getenv("HBNB_ENV") == "test":
             Base.metadata.drop_all(bind=self.__engine)
-
         Base.metadata.create_all(bind=self.__engine)
         self.__session = scoped_session(sessionmaker(bind=self.__engine,
                                                      expire_on_commit=False))
@@ -100,3 +97,9 @@ class DBStorage():
         """Drops all tables in existing in the session."""
         Base = declarative_base()
         Base.metadata.drop_all(bind=self.__engine)
+
+    def close(self):
+        """
+        call remove on the private session attribute
+        """
+        self.__session.remove()

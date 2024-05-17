@@ -90,3 +90,9 @@ class FileStorage:
             key = "{}.{}".format(obj.__class__.__name__, obj.id)
             if FileStorage.__objects.get(key) is not None:
                 del FileStorage.__objects[key]
+
+    def close(self):
+        """
+        calls reload - method for deserializing the JSON file to objects
+        """
+        reload()
