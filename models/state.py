@@ -3,8 +3,8 @@
 contains
 
 classes:
-    State - Inherits from BaseModel, represents a real-life state, mapped to the
-    states table in the database
+    State - Inherits from BaseModel, represents a real-life
+    state, mapped to the states table in the database
 """
 import os
 from models import storage
