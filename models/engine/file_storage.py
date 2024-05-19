@@ -95,4 +95,4 @@ class FileStorage:
         """
         calls reload - method for deserializing the JSON file to objects
         """
-        reload()
+        self.reload()
