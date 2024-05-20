@@ -5,6 +5,7 @@
 	width: 100%;
 	border: 1px solid #DDDDDD;
 	border-radius: 4px;
+	z-index: 100;
 }
 
 .locations {
@@ -42,6 +43,8 @@
 	border-radius: 4px;
 	max-height: 300px;
 	overflow: auto;
+	position: relative;
+	z-index: 1000;
 }
 
 .popover::-webkit-scrollbar {
